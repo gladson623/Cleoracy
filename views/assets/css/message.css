@@ -1,0 +1,18 @@
+.message {
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  .message.error {
+    background-color: #ff6b6b;
+    color: #fff;
+  }
+  
+  .message.success {
+    background-color: #6bff6b;
+    color: #fff;
+  }
+  .login{
+    position: absolute !important;
+    left: 40% !important; 
+}

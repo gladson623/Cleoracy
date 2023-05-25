@@ -1,0 +1,34 @@
+{
+    "name": "dellivier/web",
+    "description": "Dellivier Web",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eduardo Oliveira",
+            "email": "delliviercorp@gmail.com",
+            "role": "Developer, Owner"
+
+        }
+    ],
+
+    "autoload": {
+        "psr-4": {
+            "Source\\": "source"
+        },
+        "files": [
+            "source/Config.php",
+            "source/Helpers.php"
+        ]
+    },
+    "require": {
+        "ext-json": "*",
+        "coffeecode/router":  "*",
+        "coffeecode/datalayer":  "*",
+        "coffeecode/optimizer" :  "*",
+        "phpmailer/phpmailer":  "*",
+        "league/plates" :  "*",
+        "league/oauth2-google":  "*",
+        "matthiasmullie/minify" :  "*"
+    }
+}

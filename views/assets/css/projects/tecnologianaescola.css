@@ -1,0 +1,57 @@
+.carousel-caption {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    color: white;
+    text-shadow: 1px 1px 2px black;
+}
+
+html {
+
+    background-color: #bfbbb8;
+
+}
+
+header {
+
+    background-color: #52858a;
+
+}
+
+footer {
+
+    color: black;
+    font-size: 14px;
+}
+
+footer a {
+    color: #555;
+}
+
+footer a:hover {
+    color: #333;
+}
+
+footer i {
+    transition: color 0.2s ease-in-out;
+}
+
+footer i:hover {
+    color: #555;
+}
+
+
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    }
+
+.size {
+    max-width: 1700px !important;
+    width: 100% !important;
+}
+
+
+
+      
