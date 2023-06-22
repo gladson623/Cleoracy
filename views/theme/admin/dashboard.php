@@ -4,7 +4,6 @@
     <title>Dashboard de Administrador</title>
     <!-- Adicione os links de referência ao Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.all.min.js"></script>
@@ -39,7 +38,19 @@
             <div class="col-md-3 sidebar">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Gerenciar Cardapio do dia</a>
+                        <a class="nav-link" href="<?=$router->route("admin.cardapio")?>">Gerenciar Cardapio do dia</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?=$router->route("admin.calendario")?>">Gerenciar Calendário</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?=$router->route("admin.users")?>">Gerenciar Usuários</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?=$router->route("admin.turmas")?>">Gerenciar Turmas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?=$router->route("admin.materias")?>">Gerenciar Materias</a>
                     </li>
                 </ul>
             </div>
@@ -53,6 +64,41 @@
                         <h5 class="card-title">Gerenciar Cardapio do dia</h5>
                         <p class="card-text">Aqui você pode alterar o cardapio do dia.</p>
                         <a href="<?=$router->route("admin.cardapio")?>" class="btn btn-primary">Acessar</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                        <h5 class="card-title">Gerenciar Calendário</h5>
+                        <p class="card-text">Aqui você pode gerenciar o calendário e adicionar ou remover eventos.</p>
+                        <a href="<?=$router->route("admin.calendario")?>" class="btn btn-primary">Acessar</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                        <h5 class="card-title">Gerenciar Usuários</h5>
+                        <p class="card-text">Aqui você pode editar ou excluir um usuário.</p>
+                        <a href="<?=$router->route("admin.users")?>" class="btn btn-primary">Acessar</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                        <h5 class="card-title">Gerenciar Turmas</h5>
+                        <p class="card-text">Aqui você pode editar ou excluir uma turma.</p>
+                        <a href="<?=$router->route("admin.turmas")?>" class="btn btn-primary">Acessar</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                        <h5 class="card-title">Gerenciar Materias</h5>
+                        <p class="card-text">Aqui você pode editar ou excluir uma turma.</p>
+                        <a href="<?=$router->route("admin.materias")?>" class="btn btn-primary">Acessar</a>
                     </div>
                 </div>
             </div>
@@ -110,13 +156,7 @@ text: message
 });
 
 }
-$(document).ready(function() {
-    $('.dropdown-toggle').on('click', function() {
-      var dropdownMenu = $(this).siblings('.dropdown-menu');
-      $('.dropdown-menu').not(dropdownMenu).hide(); // Fecha outros dropdowns abertos
-      dropdownMenu.toggle(); // Abre ou fecha o dropdown atual
-    });
-  });
+
 
 
 

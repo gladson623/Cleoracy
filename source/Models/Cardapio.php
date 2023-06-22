@@ -8,7 +8,7 @@ use Exception;
 class Cardapio extends DataLayer {
 
     public function __construct() {
-        parent::__construct("cardapios", ["Name", "Image", "Date"], "Id", false);
+        parent::__construct("cardapios", ["Name", "Image", "Descricao" , "Date"], "Id", false);
     }
 
 

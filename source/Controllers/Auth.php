@@ -2,9 +2,17 @@
 
 namespace Source\Controllers;
 
+header('Content-type: application/json');
+ini_set('default_charset', 'utf-8');
+
+use Source\Models\CalendarEvent;
 use Source\Models\User;
 use Source\Models\Cardapio;
+use Source\Models\Materia;
+use Source\Models\Turma;
 use Source\Support\Email;
+
+use function PHPSTORM_META\sql_injection_subst;
 
 class Auth extends Controller {
 
@@ -18,7 +26,7 @@ class Auth extends Controller {
 
     public function login($data) : void {
 
-        $data = filter_var_array($data, FILTER_SANITIZE_SPECIAL_CHARS);
+        $data = filter_var_array($data);
 
         $username = filter_var($data["username"], FILTER_DEFAULT);
         $password = filter_var($data["password"], FILTER_DEFAULT);
@@ -34,6 +42,9 @@ class Auth extends Controller {
         }
 
         $user = (new User())->find("Username = :u", "u={$username}")->fetch();
+
+
+
         if(!$user || !password_verify($password, $user->Password)) {
             echo $this->ajaxResponse("message", [
                 "type" => "error",
@@ -64,20 +75,34 @@ class Auth extends Controller {
 
     public function register($data) :void {
 
-        $data = filter_var_array($data, FILTER_SANITIZE_SPECIAL_CHARS);
+        $data = filter_var_array($data);
+        
+        
+        $username =  filter_var($data["username"], FILTER_DEFAULT);
+        $email = filter_var($data["email"], FILTER_DEFAULT);
+        $password = filter_var($data["password"], FILTER_DEFAULT);
+        $confpassword = filter_var($data["confirmpassword"], FILTER_DEFAULT);
+        $first_name = filter_var($data["first_name"], FILTER_DEFAULT);
+        $grupo = filter_var($data["grupo"], FILTER_DEFAULT);
+        $Turma = filter_var($data["turma"], FILTER_DEFAULT);
+        $Materias = filter_var($data["materias"], FILTER_DEFAULT);
 
-        if(in_array("", $data)) {
 
-            echo $this->ajaxResponse("message", [
-                "type" => "error",
-                "message" => "Preencha todos os campos!"
-            ]);
+        if(in_array("", $data) || isEmptyArray($data)) {
 
-            return;
+
+            if (($grupo == 'Professor' && (empty($Materias) || empty($TurmasProf))) || ($grupo == 'Aluno' && empty($Turma))) {
+                echo $this->ajaxResponse("message", [
+                    "type" => "error",
+                    "message" => "Preencha todos os campos!"
+                ]);
+    
+                return;
+            }
 
         }
 
-        if(!filter_var($data["email"], FILTER_VALIDATE_EMAIL)) {
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             echo $this->ajaxResponse("message", [
                 "type" => "error",
                 "message" => "Favor informe um email válido!"
@@ -86,7 +111,34 @@ class Auth extends Controller {
             return;
         }
 
-        $check_user_username = (new User())->find('Username = :u', "u={$data["username"]}")->count();
+        if(!$username) {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "Digite um usuário válido!"
+            ]);
+
+            return;
+        }
+
+        if(str_contains($username, ' ')) {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "O Username deve conter apenas uma palavra! Verifique se há espaços em branco..."
+            ]);
+
+            return;
+        }
+
+        if(strlen($username) > 20) {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "O Username deve conter no máximo 20 caracteres!"
+            ]);
+
+            return;
+        }
+
+        $check_user_username = (new User())->find('Username = :u', "u={$username}")->count();
 
         if($check_user_username) {
             echo $this->ajaxResponse("message", [
@@ -97,7 +149,7 @@ class Auth extends Controller {
             return;
         }
 
-        $filter_name = filter_var($data["first_name"], FILTER_SANITIZE_SPECIAL_CHARS);
+        $filter_name = filter_var($first_name, FILTER_SANITIZE_SPECIAL_CHARS);
 
         if(!$filter_name) {
             echo $this->ajaxResponse("message", [
@@ -124,14 +176,23 @@ class Auth extends Controller {
 
             echo $this->ajaxResponse("message", [
                 "type" => "error",
-                "message" => "Digite seu nome completo!"
+                "message" => "Digite o nome completo!"
             ]);
 
             return;
 
         }
 
-        $check_user_email_qtd = (new User())->find('Email = :e', "e={$data["email"]}")->count();
+        if(strlen($filter_name) > 65) {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "O Nome completo não teve ter mais de 65 caracteres!"
+            ]);
+
+            return;
+        }
+
+        $check_user_email_qtd = (new User())->find('Email = :e', "e={$email}")->count();
 
         if($check_user_email_qtd) {
 
@@ -144,7 +205,28 @@ class Auth extends Controller {
 
         }
 
-        $check_passwords_equality = ($data["password"] === $data["confirmpassword"]);
+        if($grupo != "Aluno" && $grupo != 'Admin' && $grupo != 'Owner' && $grupo != 'Professor') {
+
+
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "Grupo inválido!"
+            ]);
+
+            return;
+        }
+
+        if($grupo == 'Owner' && getSessionUser()->Grupo != 'Owner') {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "Você não possui permissão para setar este grupo!"
+            ]);
+
+            return;
+        }
+
+
+        $check_passwords_equality = ($password === $confpassword);
 
 
         if(!$check_passwords_equality) {
@@ -159,31 +241,243 @@ class Auth extends Controller {
         }
 
         $nameParts = explode(' ', $filter_name);
-
+        $userNameExplode = explode(' ', $username);
         $first_name = $nameParts[0];
-        $last_name = implode(',', array_slice($nameParts, 0));
+        $last_name = implode(' ', array_slice($nameParts, 1));
 
         $user = new User();
-        $user->Username = $data["username"];
+        $user->Username = $userNameExplode[0];
         $user->First_Name = $first_name;
         $user->Last_Name = $last_name;
         $user->Verified = "true";
-        $user->Email = $data["email"];
-        $user->Password = password_hash($data["password"], PASSWORD_DEFAULT);
+        $user->Email = $email;
+        $user->Grupo = $grupo;
+        $user->Password = password_hash($password, PASSWORD_DEFAULT);
+        $user->Avatar = defaultImage();
 
-        $user->save();
+        if($grupo == 'Aluno') {
+            $Turma = intval($Turma);
+            if(!$Turma) {
+                echo $this->ajaxResponse("message", [
+                    "type" => "error",
+                    "message" => "Turma inválida!"
+                ]);
+    
+                return;
+            }
 
-        flash("success", "Cadastrado com sucesso!");
+            if(!(new Turma())->findById($Turma)) {
+                echo $this->ajaxResponse("message", [
+                    "type" => "error",
+                    "message" => "Turma inválida!"
+                ]);
+    
+                return;
+            }
+            
+            $user->Turma = $Turma;
+        } else if ($grupo == 'Professor') {
+
+
+            $MateriasValidate = explode(",", trim($Materias));
+
+            $MateriasValidate = array_map('intval', $MateriasValidate);
+
+            foreach($MateriasValidate as $t) {
+                $t = intval($t);
+                if(!is_int($t)) {
+                    echo $this->ajaxResponse("message", [
+                        "type" => "error",
+                        "message" => "Materia inválida!"
+                    ]);
         
-        echo $this->ajaxResponse("redirect", [
-            "url" => $this->router->route("web.login")
+                    return;
+                }
+
+                $check = (new Materia())->findById($t);
+
+                if(!$check) {
+                    echo $this->ajaxResponse("message", [
+                        "type" => "error",
+                        "message" => "Materia inválida!"
+                    ]);
+        
+                    return;
+                }
+
+                $user->MateriasTurma = implode(",", $MateriasValidate);
+            }
+
+        }
+
+        if(!$user->save()) {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "Erro ao cadastrar usuário!"
+            ]);
+
+            return;
+        }
+        
+        echo $this->ajaxResponse("message", [
+            "type" => "success",
+            "message" => "Usuário cadastrado com sucesso!"
         ]);
+
+        
 
         //$this->autenticate($user);
 
     }
 
+    public function editUser($data) : void {
+
+
+        $username =  filter_var($data["Username"], FILTER_DEFAULT);
+        $email = filter_var($data["Email"], FILTER_DEFAULT);
+        $oldpass = filter_var($data["Password"], FILTER_DEFAULT);
+        $newpass = filter_var($data["NewPassword"], FILTER_DEFAULT);
+        $confpass = filter_var($data["ConfPassword"], FILTER_DEFAULT);
+        $avatar = filter_var($data["Avatar"], FILTER_DEFAULT);
+
+        if(!getSessionUser()) {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "Houve um erro ao tentar processar os dados, favor atualizar a página!"
+            ]);
+
+            return;
+        }
+
+        $Id = getSessionUser()->Id;
+
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "Favor informe um email válido!"
+            ]);
+
+            return;
+        }
+
+        if(str_word_count($username) > 1 || str_word_count($username) < 1 || ctype_space($username)) {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "O Username deve conter apenas uma palavra!"
+            ]);
+
+            return;
+        }
+        
+        $check_user_username = (new User())->find('Username = :u AND Id <> :id', "u={$username} & id={$Id}")->count();
+
+
+        if($check_user_username) {
+           
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "Já existe um Usuário cadastrado com esse Username!"
+            ]);
+
+            return;
+        }
+
+
+        $check_user_email_qtd = (new User())->find('Email = :e AND Id <> :id', "e={$email} & id={$Id}")->count();
+
+        if($check_user_email_qtd) {
+
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "Este email já atingiu o número máximo de registros!"
+            ]);
+
+            return;
+
+        }
+
+        if(empty($oldpass) || ctype_space($oldpass)) {
+            echo $this->ajaxResponse("message", [
+                "type" => "error",
+                "message" => "Digite a sua senha atual para salvar as alterações!"
+            ]);
+
+            return;
+        }
+
+        
+
+        if(password_verify($oldpass, getSessionUser()->Password)) {
+            $userNameExplode = explode(' ', $username);
+
+            $user = (new User())->findById($Id);
+            $user->Username = $userNameExplode[0];
+            $user->Email = $email;
+
+            if(!empty($avatar) && !ctype_space($avatar)) {
+
+                    list($type, $avatar) = explode(';', $avatar);
+                    list(, $avatar) = explode(',', $avatar);
+
+                    $avatar = base64_decode($avatar);
+
+                    $avatar_name = time().'.png';
+
+                    file_put_contents('source/Client/Files/Images/Usuarios/'.$avatar_name, $avatar);
+
+                    $user->Avatar = '/source/Client/Files/Images/Usuarios/'.$avatar_name;
+
+            }
+            
+
+
+            if(!empty($newpass)) {
+                if(ctype_space($newpass)) {
+                    echo $this->ajaxResponse("message", [
+                        "type" => "error",
+                        "message" => "Digite uma senha válida!"
+                    ]);
+        
+                    return;
+                }
+
+                if($newpass !== $confpass) {
+                    echo $this->ajaxResponse("message", [
+                        "type" => "error",
+                        "message" => "As senhas não conferem!"
+                    ]);
+        
+                    return;
+                }
+
+                $user->Password = password_hash($newpass, PASSWORD_DEFAULT);
+            }
+
+            if(!$user->save()) {
+
+                echo $this->ajaxResponse("message", [
+                    "type" => "error",
+                    "message" => "Não foi possível salvar seus dados!"
+                ]);
     
+                return;
+            }
+
+            echo $this->ajaxResponse("message", [
+                "type" => "success",
+                "message" => "Usuário salvo com sucesso!"
+            ]);
+
+            return;
+
+        }
+
+        echo $this->ajaxResponse("message", [
+            "type" => "error",
+            "message" => "Senha incorreta!"
+        ]);
+
+    }
 
     public function forget($data): void {
 
@@ -385,6 +679,23 @@ class Auth extends Controller {
         ]);
 
 
+    }
+
+    public function calendarEvents() {
+        $events = (new CalendarEvent)->find()->fetch(true);
+        echo $this->ajaxResponse("message", [
+            "events" => $events ? $events : null
+        ]);
+
+    }
+
+    
+    public function contact() {
+        echo $this->ajaxResponse("message", [
+            "type" => 'error',
+            "message" => 'Contato em desenvolvimento...'
+        ]);
+        return;
     }
 
 }

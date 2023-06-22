@@ -52,6 +52,16 @@ class App extends Controller {
         ]);
     }
 
+    public function calendario(): void {
+        $head = $this->seo->optimize("Calendario | ".site("name"), site("desc"), $this->router->route("app.calendario"), routeImage("Calendario"))->render();
+    
+    
+        echo $this->view->render("theme/app/calendario", [
+            "head" => $head,
+            "user" => $this->user
+        ]);
+    }
+
     public function contact(): void {
         $head = $this->seo->optimize("Contato | ".site("name"), site("desc"), $this->router->route("app.contact"), routeImage("Contato"))->render();
     

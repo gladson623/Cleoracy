@@ -40,6 +40,18 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Gerenciar Cardapio do dia</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?=$router->route("admin.calendario")?>">Gerenciar Calendário</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?=$router->route("admin.users")?>">Gerenciar Usuários</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?=$router->route("admin.turmas")?>">Gerenciar Turmas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?=$router->route("admin.materias")?>">Gerenciar Materias</a>
+                    </li>
                 </ul>
             </div>
             
@@ -53,12 +65,16 @@
                 <div class="form-group">
                     <label for="prato">Nome do Prato</label>
                     <input type="text" name="dishName" class="form-control" id="prato">
-                </div>                   
+                </div>        
+                <div class="form-group">
+                    <label for="imagem">Descrição</label>
+                    <input type="text" name="dishDesc" class="form-control-file" id="desc">
+                </div>           
                 <div class="form-group">
                     <label for="imagem">Imagem do Prato</label>
                     <input type="file" name="dishImage" class="form-control-file" id="imagem">
                 </div>
-                <button type="submit" class="btn btn-primary">Salvar</button>
+                <button type="submit" class="btn btn-primary" id="save">Salvar</button>
             </form>
             <br>
             <button class="btn btn-primary" id="btnModal">Visualizar</button>
@@ -73,7 +89,7 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p><?=getTodayMenu();?></p>
+                    <p id="vis"><?=getTodayMenu();?></p>
                 </div>
                 </div>
             </div>
@@ -83,6 +99,22 @@
 </body>
 </html>
 <style>
+
+    #vis {
+        
+        font-family: cursive;
+        font-size: xx-large;
+
+    }
+
+    #vis img {
+
+        height: 200px;
+        width: 200px;
+        border-radius: 50%;
+
+    }
+
         .navbar-brand {
             font-weight: bold;
         }
@@ -144,17 +176,25 @@
           Swal.close();
   
           if (su.message) {
+
             Swal.fire({
               icon: su.message.type === 'error' ? 'error' : 'success',
               title: su.message.type === 'error' ? 'Erro' : 'Sucesso',
               text: su.message.message,
             });
+
+            if(su.message.cardapio) {
+                var modalContent = document.getElementById("vismodal").querySelector(".modal-body");
+                modalContent.innerHTML = '<p id="vis">' + su.message.cardapio + '</p>';
+            }
             return;
           }
   
           if (su.redirect) {
             location.href = su.redirect.url;
           }
+
+
         },
         contentType: false,
         processData: false
@@ -172,14 +212,6 @@ function flash(type, message) {
 
 }
 
-$(document).ready(function() {
-    $('.dropdown-toggle').on('click', function() {
-      var dropdownMenu = $(this).siblings('.dropdown-menu');
-      $('.dropdown-menu').not(dropdownMenu).hide(); // Fecha outros dropdowns abertos
-      dropdownMenu.toggle(); // Abre ou fecha o dropdown atual
-    });
-  });
-
 
 
 // Obtém o elemento do botão e o modal
@@ -191,6 +223,7 @@ var closeButton = modal.querySelector(".close");
 btnModal.addEventListener("click", function() {
   modal.style.display = "block";
 });
+
 
 // Adiciona um manipulador de eventos ao botão de fechar do modal
 closeButton.addEventListener("click", function() {

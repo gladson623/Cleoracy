@@ -26,7 +26,13 @@ $(function () {
               icon: su.message.type === 'error' ? 'error' : 'success',
               title: su.message.type === 'error' ? 'Erro' : 'Sucesso',
               text: su.message.message,
+              confirmButtonText: 'OK'
+
+            }).then(() => {
+                if(su.message.type === 'success') location.reload();
+    
             });
+
             return;
           }
   
