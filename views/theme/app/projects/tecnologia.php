@@ -62,20 +62,46 @@
                       <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
                       <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
                       <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                      <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+                      <li data-target="#carouselExampleIndicators" data-slide-to="4"></li>
+                      <li data-target="#carouselExampleIndicators" data-slide-to="5"></li>
+                      <li data-target="#carouselExampleIndicators" data-slide-to="6"></li>
+                      <li data-target="#carouselExampleIndicators" data-slide-to="7"></li>
                     </ol>
                     <div class="carousel-inner">
                       <div class="carousel-item active">
-                        <img src="https://via.placeholder.com/800x400/000000/FFFFFF" class="d-block w-100" alt="Slide 1">
+                        <img src="../../../assets/images/aprendizagem.png" class="d-block w-100" alt="Slide 1">
       
                       </div>
                       <div class="carousel-item">
-                        <img src="https://via.placeholder.com/800x400/0000FF/FFFFFF" class="d-block w-100" alt="Slide 2">
+                        <img src="../../../assets/images/avaliacao.png" class="d-block w-100" alt="Slide 2">
       
                       </div>
                       <div class="carousel-item">
-                        <img src="https://via.placeholder.com/800x400/FF0000/FFFFFF" class="d-block w-100" alt="Slide 3">
+                        <img src="../../../assets/images/avancos.png" class="d-block w-100" alt="Slide 3">
       
                       </div>
+                      <div class="carousel-item">
+                        <img src="../../../assets/images/colaborativa.png" class="d-block w-100" alt="Slide 4">
+      
+                      </div>
+                      <div class="carousel-item active">
+                        <img src="../../../assets/images/gamificacao.png" class="d-block w-100" alt="Slide 5">
+      
+                      </div>
+                      <div class="carousel-item">
+                        <img src="../../../assets/images/movel.png" class="d-block w-100" alt="Slide 6">
+      
+                      </div>
+                      <div class="carousel-item">
+                        <img src="../../../assets/images/potencial.png" class="d-block w-100" alt="Slide 7">
+      
+                      </div>
+                      <div class="carousel-item">
+                        <img src="../../../assets/images/realidade.png" class="d-block w-100" alt="Slide 8">
+      
+                      </div>
+                      
                     </div>
                     <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
                       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
